@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>守護寶貝在"嘉"好安心-智育積木專注力挑戰 V8</title>
+    <style>
+        /* 嵌入注音字型與中文直書字型 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+BopoMoFo&family=Noto+Sans+TC:wght=500;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            /* 優先使用注音字型，無注音時使用圓潤繁中 */
+            font-family: 'Noto Sans BopoMoFo', 'Noto Sans TC', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            
+            /* --- 使用全新乾淨無浮水印的插畫作為全螢幕背景 --- */
+            background-image: url('https://i.meee.com.tw/DADp8GA.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #fff8e7; /* 預備底色 */
+            overflow-x: hidden;
+        }
+
+        /* 增加一層淡淡的顆粒感濾鏡，讓手繪插畫風更融合 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(rgba(0, 0, 0, 0.02) 12%, transparent 12%);
+            background-size: 8px 8px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- 遊戲首頁入口樣式 --- */
+        .welcome-screen {
+            width: 92%;
+            max-width: 650px;
+            background: rgba(255, 255, 255, 0.95); /* 微調透明度融於背景 */
+            border-radius: 25px; /* 手繪風圓邊 */
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 10px 10px 0px #2d3436;
+            border: 4px solid #2d3436;
+            backdrop-filter: blur(5px);
+            animation: introPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+        }
+
+        @keyframes introPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .welcome-screen h1 {
+            color: #2d3436;
+            font-size: 2.4rem;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 0px #ffeaa7, 6px 6px 0px #2d3436;
+        }
+
+        .welcome-desc {
+            font-size: 1.35rem;
+            color: #2d3436;
+            line-height: 1.8;
+            background: #fff5da;
+            padding: 22px;
+            border-radius: 18px;
+            border: 4px solid #2d3436;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .start-btn {
+            background: #ff7675;
+            color: white;
+            font-size: 1.65rem;
+            font-weight: bold;
+            padding: 15px 55px;
+            border: 4px solid #2d3436;
+            border-radius: 40px;
+            box-shadow: 6px 6px 0px #2d3436;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .start-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px #2d3436;
+        }
+
+        /* --- 遊戲主體面板 --- */
+        .main-game-wrapper {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            padding: 15px;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #2d3436;
+            font-size: 2.2rem;
+            margin: 10px 0;
+            text-shadow: 3px 3px 0px #ffffff, 5px 5px 0px #2d3436;
+        }
+
+        .game-info {
+            font-size: 1.25rem;
+            color: #ffffff;
+            background: #ff7675;
+            padding: 8px 25px;
+            border-radius: 35px;
+            box-shadow: 4px 4px 0px #2d3436;
+            display: inline-block;
+            border: 4px solid #2d3436;
+            font-weight: bold;
+        }
+
+        .game-container {
+            width: 92%;
+            max-width: 950px;
+            background: rgba(255, 255, 255, 0.93); /* 白色微透 */
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 12px 12px 0px #2d3436;
+            border: 4px solid #2d3436;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(3px);
+        }
+
+        .play-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .play-area { grid-template-columns: 1fr; gap: 20px; }
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
+            background: rgba(253, 253, 253, 0.85);
+            padding: 25px 20px;
+            border-radius: 18px;
+            border: 4px solid #2d3436;
+            box-shadow: inset 4px 4px 0px rgba(0,0,0,0.04);
+        }
+
+        .column-title {
+            font-size: 1.35rem;
+            font-weight: bold;
+            color: white;
+            background: #2d3436;
+            padding: 6px 22px;
+            border: 2px solid #ffffff;
+            border-radius: 30px;
+            box-shadow: 4px 4px 0px #fdcb6e;
+        }
+
+        /* --- 夢幻不飽和馬卡龍色系配色 --- */
+        .rb-red { background-color: #ffb3ba; color: #2d3436 !important; text-shadow: none !important; }
+        .rb-orange { background-color: #ffdfba; color: #2d3436 !important; text-shadow: none !important; }
+        .rb-yellow { background-color: #ffffba; color: #2d3436 !important; text-shadow: none !important; }
+        .rb-green { background-color: #baffc9; color: #2d3436 !important; text-shadow: none !important; }
+        .rb-blue { background-color: #bae1ff; color: #2d3436 !important; text-shadow: none !important; }
+        .rb-indigo { background-color: #b5b9ff; color: #2d3436 !important; text-shadow: none !important; }
+        .rb-purple { background-color: #e8b7ff; color: #2d3436 !important; text-shadow: none !important; }
+
+        .color-blue { background-color: #bae1ff; color: #2d3436 !important; text-shadow: none !important; }
+        .color-green { background-color: #baffc9; color: #2d3436 !important; text-shadow: none !important; }
+        .color-orange { background-color: #ffdfba; color: #2d3436 !important; text-shadow: none !important; }
+        .color-red { background-color: #ffb3ba; color: #2d3436 !important; text-shadow: none !important; }
+        .color-purple { background-color: #e8b7ff; color: #2d3436 !important; text-shadow: none !important; }
+        .color-cyan { background-color: #bffffa; color: #2d3436 !important; text-shadow: none !important; }
+
+        /* --- 第一階段項目 --- */
+        .draggable {
+            width: 100%;
+            min-height: 85px; 
+            border-radius: 15px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+            text-align: center;
+            padding: 15px 20px;
+            border: 4px solid #2d3436;
+            box-shadow: 5px 5px 0px #2d3436;
+        }
+        .draggable:active { cursor: grabbing; }
+
+        /* --- 第二、三階段：巨大圖形積木 --- */
+        .shape-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+            line-height: 1.3;
+            cursor: grab;
+            border: 4px solid #2d3436;
+            box-shadow: 5px 5px 0px #2d3436;
+            text-align: center;
+            padding: 10px;
+        }
+        .shape-item:active { cursor: grabbing; }
+
+        /* 巨大形狀尺寸與特殊剪裁 */
+        .shp-circle { border-radius: 50%; width: 135px; height: 135px; }
+        .shp-square { border-radius: 15px; width: 125px; height: 125px; }
+        
+        .shp-triangle {
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            width: 145px; height: 130px;
+            padding-top: 45px;
+            border: none !important;
+            filter: drop-shadow(4px 4px 0px #2d3436);
+        }
+        .shp-rectangle { border-radius: 15px; width: 180px; height: 115px; }
+        .shp-pentagon {
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            width: 140px; height: 135px;
+            padding-top: 32px;
+            border: none !important;
+            filter: drop-shadow(4px 4px 0px #2d3436);
+        }
+
+        /* --- 全新：高科技自訂跟隨影子樣式（修正拖曳方框問題） --- */
+        .custom-drag-shadow {
+            position: fixed;
+            pointer-events: none; /* 穿透不干擾放下的判定 */
+            z-index: 9999;
+            opacity: 0.85;
+            transform: translate(-50%, -50%); /* 精準置中在游標下方 */
+            display: none;
+            box-sizing: border-box;
+        }
+
+        /* 被拖曳中的原始元件半透明隱藏 */
+        .dragging-now {
+            opacity: 0.3 !important;
+        }
+
+        /* --- 放置目標洞口樣式 --- */
+        .dropzone {
+            width: 100%;
+            min-height: 85px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+            padding: 15px;
+            border: 4px solid #2d3436;
+            box-shadow: inset 4px 4px 0px rgba(0,0,0,0.1);
+        }
+
+        .silhouette-zone {
+            background-color: #dfe6e9;
+            border: 4px solid #2d3436;
+            box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2);
+            width: 100%;
+            min-height: 165px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-radius: 15px;
+        }
+
+        .silhouette-visual {
+            background-color: #2d3436;
+            box-shadow: inset 0 5px 8px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .silhouette-label {
+            margin-top: 8px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #2d3436;
+            background: rgba(255,255,255,0.85);
+            padding: 2px 10px;
+            border-radius: 8px;
+            border: 2px solid #2d3436;
+        }
+
+        .drag-over {
+            transform: scale(1.03);
+            background-color: #ffeaa7 !important;
+        }
+
+        .matched {
+            background-color: rgba(0, 0, 0, 0.65) !important;
+            color: #ffffff !important;
+            text-shadow: 2px 2px 0px #000000 !important;
+            box-shadow: none !important;
+            border-color: #2d3436 !important;
+        }
+
+        .matched-sil {
+            background-color: #00b846 !important;
+            box-shadow: none !important;
+        }
+        .matched-sil .silhouette-visual {
+            background-color: #ffffff !important;
+            color: #00b846 !important;
+            box-shadow: none !important;
+        }
+        .matched-sil .silhouette-label {
+            color: #ffffff;
+            background: transparent;
+            border-color: transparent;
+        }
+
+        /* 彈窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center; align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .modal {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 10px 10px 0px #2d3436;
+            max-width: 420px; width: 85%;
+            border: 4px solid #2d3436;
+            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+        }
+        @keyframes popUp {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal h2 { font-size: 2.3rem; color: #ff7675; margin-top: 0; text-shadow: 2px 2px 0px #2d3436; }
+        .modal p { font-size: 1.4rem; color: #2d3436; font-weight: bold; text-align: center; line-height: 1.6; }
+        .modal button {
+            background: #00b846; color: white; border: 4px solid #2d3436;
+            padding: 12px 40px; font-size: 1.4rem; font-weight: bold;
+            box-shadow: 5px 5px 0px #2d3436; border-radius: 30px;
+            margin-top: 15px; cursor: pointer;
+        }
+        .modal button:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0px #2d3436; }
+    </style>
+</head>
+<body>
+
+    <div id="active-drag-shadow" class="custom-drag-shadow"></div>
+
+    <div class="welcome-screen" id="welcome-screen">
+        <h1>🌟守護寶貝在"嘉"好安心🌟<br><span style="font-size: 1.8rem; color: #ff7675;">智育積木專注力挑戰</span></h1>
+        <div class="welcome-desc">
+            歡迎來到專注力挑戰！<br>
+            請仔細觀察左側「拿取積木」的<br>
+            <span style="color: #ff7675;">色彩</span> 與 <span style="color: #bae1ff; background-color:#2d3436; padding: 2px 6px; border-radius:5px;">圖形</span>，<br>
+            並將它們精準拖曳投入右側收納槽中。<br>
+            準備好測試你的反應與專注力了嗎？
+        </div>
+        <button class="start-btn" onclick="startGame()">開始挑戰 🌟</button>
+    </div>
+
+    <div class="main-game-wrapper" id="main-game-wrapper">
+        <header>
+            <h1>🌟 守護寶貝在"嘉"好安心 - 智育積木專注力挑戰 🌟</h1>
+            <div class="game-info" id="stage-title">關卡載入中...</div>
+        </header>
+
+        <div class="game-container">
+            <div style="text-align: center; margin-bottom: 15px; font-size: 1.25rem; color: #2d3436; font-weight: bold;" id="stage-desc">
+                觀察積木外觀，拖曳投入正確的對應洞口吧！
+            </div>
+
+            <div class="play-area">
+                <div class="column" id="source-column">
+                    <div class="column-title">拿取積木</div>
+                </div>
+
+                <div class="column" id="target-column">
+                    <div class="column-title">正確投入洞口</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h2 id="modal-title">太棒了！</h2>
+            <p id="modal-text">成功完成分類囉！</p>
+            <button id="modal-btn" onclick="nextStage()">下一關</button>
+        </div>
+    </div>
+
+    <script>
+        const stagesData = [
+            {
+                id: 1,
+                title: "第一關：7大服務色彩配對挑戰 🎨",
+                desc: "請將左側積木拖曳到右側【完全相同色彩】的對應收納洞口！",
+                items: [
+                    { id: "s1", name: "健康檢查", type: "color", val: "rb-red", label: "健康檢查" },
+                    { id: "s2", name: "發展評估", type: "color", val: "rb-orange", label: "發展評估" },
+                    { id: "s3", name: "初級照護", type: "color", val: "rb-yellow", label: "初級照護" },
+                    { id: "s4", name: "育兒諮詢", type: "color", val: "rb-green", label: "育兒諮詢" },
+                    { id: "s5", name: "衛生教育", type: "color", val: "rb-blue", label: "衛生教育" },
+                    { id: "s6", name: "預防接種", type: "color", val: "rb-indigo", label: "預防接種" },
+                    { id: "s7", name: "居家訪視", type: "color", val: "rb-purple", label: "居家訪視" }
+                ]
+            },
+            {
+                id: 2,
+                title: "第二關：3項追蹤圖形配對挑戰 📐",
+                desc: "請觀察其【圖形剪影】，並將它精準投入右側的黑洞中！",
+                items: [
+                    { id: "t1", name: "預防<br>保健", type: "silhouette", val: "shp-circle color-blue", sClass: "shp-circle", label: "圓形孔洞", bgType: "default" },
+                    { id: "t2", name: "疫苗<br>接種", type: "silhouette", val: "shp-square color-green", sClass: "shp-square", label: "正方形孔洞", bgType: "default" },
+                    { id: "t3", name: "膽道閉鎖<br>追蹤", type: "silhouette", val: "shp-triangle color-orange", sClass: "shp-triangle", label: "三角形孔洞", bgType: "default" }
+                ]
+            },
+            {
+                id: 3,
+                title: "第三關：4項通報轉介色彩與圖形配對挑戰 🏆",
+                desc: "請觀察其【圖形、色彩剪影】，並將它精準投入右側的黑洞中！",
+                items: [
+                    { id: "r1", name: "牙齒<br>塗氟", type: "silhouette", val: "shp-rectangle color-red", sClass: "shp-rectangle", label: "長方形孔洞", bgType: "match", colorCode: "#ffb3ba" },
+                    { id: "r2", name: "就醫<br>轉診", type: "silhouette", val: "shp-triangle color-blue", sClass: "shp-triangle", label: "三角形孔洞", bgType: "match", colorCode: "#bae1ff" },
+                    { id: "r3", name: "發展<br>遲緩", type: "silhouette", val: "shp-circle color-purple", sClass: "shp-circle", label: "圓形孔洞", bgType: "match", colorCode: "#e8b7ff" },
+                    { id: "r4", name: "兒少<br>保護", type: "silhouette", val: "shp-pentagon color-cyan", sClass: "shp-pentagon", label: "五邊形孔洞", bgType: "match", colorCode: "#bffffa" }
+                ]
+            }
+        ];
+
+        let currentStageIndex = 0;
+        let matchedCount = 0;
+        let draggedIdGlobal = null; 
+        const shadowContainer = document.getElementById('active-drag-shadow');
+
+        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+
+        function startGame() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('main-game-wrapper').style.display = 'flex';
+            initStage(currentStageIndex);
+        }
+
+        function initStage(stageIndex) {
+            const stage = stagesData[stageIndex];
+            matchedCount = 0;
+            draggedIdGlobal = null;
+            shadowContainer.innerHTML = '';
+            shadowContainer.style.display = 'none';
+            
+            document.getElementById('stage-title').innerText = stage.title;
+            document.getElementById('stage-desc').innerText = stage.desc;
+
+            const sourceColumn = document.getElementById('source-column');
+            const targetColumn = document.getElementById('target-column');
+
+            sourceColumn.innerHTML = '<div class="column-title">拿取積木</div>';
+            targetColumn.innerHTML = '<div class="column-title">正確投入洞口</div>';
+
+            const shuffledSources = shuffle([...stage.items]);
+            const shuffledTargets = shuffle([...stage.items]);
+
+            // 渲染左側積木
+            shuffledSources.forEach(item => {
+                const div = document.createElement('div');
+                div.id = item.id;
+                div.draggable = true;
+                div.innerHTML = item.name;
+
+                if (item.type === 'color') {
+                    div.className = `draggable ${item.val}`;
+                } else if (item.type === 'silhouette') {
+                    div.className = `shape-item ${item.val}`;
+                }
+
+                // 註冊全面接管的電腦與手機複合式跟隨拖曳事件
+                div.addEventListener('dragstart', handleCustomDragStart);
+                div.addEventListener('touchstart', handleCustomTouchStart, {passive: false});
+                div.addEventListener('touchmove', handleCustomTouchMove, {passive: false});
+                div.addEventListener('touchend', handleCustomTouchEnd, {passive: false});
+
+                sourceColumn.appendChild(div);
+            });
+
+            // 渲染右側目標孔洞
+            shuffledTargets.forEach(item => {
+                const div = document.createElement('div');
+                div.dataset.matchId = item.id;
+
+                if (item.type === 'color') {
+                    div.className = `dropzone target-rb ${item.val}`;
+                } else if (item.type === 'silhouette') {
+                    div.className = 'silhouette-zone';
+                    
+                    if (item.bgType === 'match') {
+                        div.style.backgroundColor = item.colorCode;
+                    }
+                    
+                    const visual = document.createElement('div');
+                    visual.className = `silhouette-visual ${item.sClass}`;
+                    
+                    const label = document.createElement('div');
+                    label.className = 'silhouette-label';
+                    label.innerText = `瞄準投入：${item.label}`;
+
+                    div.appendChild(visual);
+                    div.appendChild(label);
+                }
+
+                div.addEventListener('dragover', dragOver);
+                div.addEventListener('dragleave', dragLeave);
+                div.addEventListener('drop', dropEvent);
+
+                targetColumn.appendChild(div);
+            });
+        }
+
+        // --- 全新：電腦端滑鼠跟隨機制（完全維持三角形、五邊形圖形） ---
+        function handleCustomDragStart(e) {
+            draggedIdGlobal = this.id;
+            e.dataTransfer.setData('text/plain', this.id);
+            
+            // 建立完美的跟隨複製品
+            createDragShadow(this);
+            this.classList.add('dragging-now');
+
+            // 隱藏瀏覽器自帶的方框透明影子
+            const img = new Image();
+            img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            e.dataTransfer.setDragImage(img, 0, 0);
+
+            // 全局監聽滑鼠移動，讓影子完美貼隨游標
+            document.addEventListener('dragover', updateMouseShadowPosition);
+            this.addEventListener('dragend', handleCustomDragEnd);
+        }
+
+        function updateMouseShadowPosition(e) {
+            shadowContainer.style.left = e.clientX + 'px';
+            shadowContainer.style.top = e.clientY + 'px';
+        }
+
+        function handleCustomDragEnd(e) {
+            this.classList.remove('dragging-now');
+            shadowContainer.style.display = 'none';
+            document.removeEventListener('dragover', updateMouseShadowPosition);
+        }
+
+        // --- 行動端（手機/平板）觸控跟隨機制 ---
+        function handleCustomTouchStart(e) {
+            draggedIdGlobal = this.id;
+            createDragShadow(this);
+            this.classList.add('dragging-now');
+            
+            const touch = e.touches[0];
+            shadowContainer.style.left = touch.clientX + 'px';
+            shadowContainer.style.top = touch.clientY + 'px';
+        }
+
+        function handleCustomTouchMove(e) {
+            if (!draggedIdGlobal) return;
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            shadowContainer.style.left = touch.clientX + 'px';
+            shadowContainer.style.top = touch.clientY + 'px';
+
+            // 偵測底層的滑過目標孔洞
+            const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+            document.querySelectorAll('.silhouette-zone, .dropzone').forEach(zone => zone.classList.remove('drag-over'));
+            
+            if (targetElement) {
+                const zone = targetElement.closest('.silhouette-zone, .dropzone');
+                if (zone && !zone.classList.contains('matched') && !zone.classList.contains('matched-sil')) {
+                    zone.classList.add('drag-over');
+                }
+            }
+        }
+
+        function handleCustomTouchEnd(e) {
+            if (!draggedIdGlobal) return;
+            const sourceEl = document.getElementById(draggedIdGlobal);
+            if (sourceEl) sourceEl.classList.remove('dragging-now');
+
+            shadowContainer.style.display = 'none';
+            const touch = e.changedTouches[0];
+            const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            document.querySelectorAll('.silhouette-zone, .dropzone').forEach(zone => zone.classList.remove('drag-over'));
+
+            if (targetElement) {
+                const targetZone = targetElement.closest('.silhouette-zone, .dropzone');
+                if (targetZone && !targetZone.classList.contains('matched') && !targetZone.classList.contains('matched-sil')) {
+                    checkMatch(draggedIdGlobal, targetZone);
+                }
+            }
+            draggedIdGlobal = null;
+        }
+
+        // 輔助函式：完美複製來源元件的外觀屬性
+        function createDragShadow(sourceEl) {
+            shadowContainer.innerHTML = sourceEl.innerHTML;
+            shadowContainer.className = 'custom-drag-shadow ' + sourceEl.className;
+            shadowContainer.classList.remove('dragging-now');
+            shadowContainer.style.width = sourceEl.offsetWidth + 'px';
+            shadowContainer.style.height = sourceEl.offsetHeight + 'px';
+            shadowContainer.style.display = 'flex';
+        }
+
+        // --- 網頁原生拖曳標準事件 ---
+        function dragOver(e) {
+            e.preventDefault();
+            const zone = e.target.closest('.silhouette-zone, .dropzone');
+            if (zone && !zone.classList.contains('matched') && !zone.classList.contains('matched-sil')) {
+                zone.classList.add('drag-over');
+            }
+        }
+
+        function dragLeave(e) {
+            const zone = e.target.closest('.silhouette-zone, .dropzone');
+            if (zone) zone.classList.remove('drag-over');
+        }
+
+        function dropEvent(e) {
+            e.preventDefault();
+            const targetZone = e.target.closest('.silhouette-zone, .dropzone');
+            if (!targetZone || targetZone.classList.contains('matched') || targetZone.classList.contains('matched-sil')) return;
+
+            targetZone.classList.remove('drag-over');
+            const draggedId = e.dataTransfer.getData('text/plain') || draggedIdGlobal;
+            checkMatch(draggedId, targetZone);
+        }
+
+        // --- 比對成功與過關邏輯 ---
+        function checkMatch(draggedId, targetZone) {
+            const sourceEl = document.getElementById(draggedId);
+            if (!sourceEl) return;
+            
+            if (targetZone.dataset.matchId === draggedId) {
+                if (targetZone.classList.contains('silhouette-zone')) {
+                    targetZone.classList.add('matched-sil');
+                    const visual = targetZone.querySelector('.silhouette-visual');
+                    visual.innerText = "✓ OK";
+                    targetZone.querySelector('.silhouette-label').innerText = `完美投入！`;
+                } else {
+                    targetZone.className = "dropzone matched";
+                    targetZone.innerHTML = `🎉 完美投入！`;
+                }
+                
+                sourceEl.style.visibility = 'hidden';
+                sourceEl.style.pointerEvents = 'none';
+                matchedCount++;
+
+                if (matchedCount === stagesData[currentStageIndex].items.length) {
+                    showWinModal();
+                }
+            } else {
+                const originalBorder = targetZone.style.borderColor;
+                targetZone.style.borderColor = '#ff3f34';
+                setTimeout(() => { targetZone.style.borderColor = originalBorder; }, 400);
+            }
+        }
+
+        function showWinModal() {
+            const overlay = document.getElementById('modal-overlay');
+            const title = document.getElementById('modal-title');
+            const text = document.getElementById('modal-text');
+            const btn = document.getElementById('modal-btn');
+
+            if (currentStageIndex < 2) {
+                title.innerText = "⚡下一關⚡";
+                text.innerText = `成功過關！配對完全正確！`;
+                btn.innerText = "進入下一關";
+            } else {
+                title.innerText = "🏆全數通關🏆";
+                text.innerHTML = "完美通關！<br>您是優秀的專注力大師！";
+                btn.innerText = "回首頁重新挑戰";
+            }
+            overlay.style.display = 'flex';
+        }
+
+        function nextStage() {
+            document.getElementById('modal-overlay').style.display = 'none';
+            if (currentStageIndex < 2) {
+                currentStageIndex++;
+                initStage(currentStageIndex);
+            } else {
+                currentStageIndex = 0;
+                document.getElementById('main-game-wrapper').style.display = 'none';
+                document.getElementById('welcome-screen').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
